@@ -7,7 +7,7 @@ import {
   launchImageLibrary,
 } from 'react-native-image-picker';
 import { ChatMode, FileInfo, FileType } from '../../types/Chat.ts';
-import { pick, types } from 'react-native-document-picker';
+import { pick, types } from '@react-native-documents/picker';
 import { saveFile } from '../util/FileUtils.ts';
 import {
   createVideoThumbnail,
