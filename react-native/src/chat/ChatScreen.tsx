@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Composer, GiftedChat } from 'react-native-gifted-chat';
+import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { Composer, GiftedChat, IMessage } from 'react-native-gifted-chat';
 import {
   AppState,
   Dimensions,
@@ -69,6 +69,7 @@ import {
 import HeaderTitle from './component/HeaderTitle.tsx';
 import { showInfo } from './util/ToastUtils.ts';
 import { HeaderOptions } from '@react-navigation/elements';
+import QuickNote from './component/QuickNote.tsx';
 
 const BOT_ID = 2;
 
@@ -104,7 +105,8 @@ function ChatScreen(): React.JSX.Element {
     modeRef.current === ChatMode.Text;
 
   const [messages, setMessages] = useState<SwiftChatMessage[]>([]);
-  const [isLoadingMessages, setIsLoadingMessages] = useState<boolean>(false);
+  const { data: messagesData, isLoading: isLoadingMessages } =
+    getMessagesBySessionId(initialSessionId ?? getSessionId() + 1);
   const [systemPrompt, setSystemPrompt] = useState<SystemPrompt | null>(
     isNovaSonic ? getCurrentVoiceSystemPrompt : getCurrentSystemPrompt
   );
@@ -302,10 +304,9 @@ function ChatScreen(): React.JSX.Element {
       if (isNovaSonicRef.current) {
         endVoiceConversation().then();
       }
-      setIsLoadingMessages(true);
-      const msg = getMessagesBySessionId(initialSessionId);
+      const msg = messagesData?.messages ?? [];
       sessionIdRef.current = initialSessionId;
-      setUsage((msg[0] as SwiftChatMessage).usage);
+      setUsage((msg[0] as SwiftChatMessage)?.usage);
       setSystemPrompt(null);
       saveCurrentSystemPrompt(null);
       saveCurrentVoiceSystemPrompt(null);
@@ -314,17 +315,15 @@ function ChatScreen(): React.JSX.Element {
       });
       if (isMac) {
         setMessages(msg);
-        setIsLoadingMessages(false);
         scrollToBottom();
       } else {
         setTimeout(() => {
           setMessages(msg);
-          setIsLoadingMessages(false);
           scrollToBottom();
         }, 200);
       }
     }
-  }, [initialSessionId, mode, tapIndex, endVoiceConversation]);
+  }, [initialSessionId, mode, tapIndex, endVoiceConversation, messagesData]);
 
   // deleteChat listener
   useEffect(() => {
@@ -678,10 +677,49 @@ function ChatScreen(): React.JSX.Element {
     }
   };
 
+  const handleSaveNote = (note: string) => {
+    trigger(HapticFeedbackTypes.impactMedium);
+    const newSessionId = getSessionId() + 1;
+    sessionIdRef.current = newSessionId;
+    sendEventRef.current('updateHistorySelectedId', {
+      id: newSessionId,
+    });
+
+    const message: SwiftChatMessage = {
+      _id: uuid.v4(),
+      text: note,
+      createdAt: new Date(),
+      user: {
+        _id: 1,
+        name: 'You',
+      },
+    };
+
+    const newMessages = [message];
+    setMessages(newMessages);
+    bedrockMessages.current = []; // No bedrock messages for notes
+
+    const noteUsage: Usage = {
+      modelName: 'Note',
+      inputTokens: 0,
+      outputTokens: 0,
+      totalTokens: 0,
+    };
+    setUsage(noteUsage);
+
+    saveMessages(newSessionId, newMessages, noteUsage);
+    saveMessageList(newSessionId, newMessages[0], modeRef.current);
+
+    if (drawerTypeRef.current === 'permanent') {
+      sendEventRef.current('updateHistory');
+    }
+    setShowSystemPrompt(false);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <GiftedChat
-        messageContainerRef={flatListRef}
+        messageContainerRef={flatListRef as RefObject<FlatList<IMessage>>}
         textInputRef={textInputRef}
         keyboardShouldPersistTaps="never"
         bottomOffset={
@@ -698,12 +736,17 @@ function ChatScreen(): React.JSX.Element {
         }}
         alignTop={false}
         inverted={true}
-        renderChatEmpty={() => (
-          <EmptyChatComponent
-            chatMode={modeRef.current}
-            isLoadingMessages={isLoadingMessages}
-          />
-        )}
+        renderChatEmpty={() => {
+          if (modeRef.current === ChatMode.Text && messages.length === 0) {
+            return <QuickNote onSaveNote={handleSaveNote} />;
+          }
+          return (
+            <EmptyChatComponent
+              chatMode={modeRef.current}
+              isLoadingMessages={isLoadingMessages}
+            />
+          );
+        }}
         alwaysShowSend={
           chatStatus !== ChatStatus.Init || selectedFiles.length > 0
         }
@@ -875,7 +918,7 @@ function ChatScreen(): React.JSX.Element {
             }, 1);
             const msg: SwiftChatMessage = {
               text: inputTexRef.current,
-              user: { _id: 1 },
+              user: { _id: 1, name: 'You' },
               createdAt: new Date(),
               _id: uuid.v4(),
             };

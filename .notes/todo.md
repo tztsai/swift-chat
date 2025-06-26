@@ -23,6 +23,7 @@
 * [ ] Build a **Browser Extension** to capture webpages, highlights, and AI chats.
 * [ ] Build a **Wechat service account** to capture anything shared with it.
 * [ ] Build service workers to ingest RSS feeds and email newsletters.
+* [ ] Create 2D minimap for dialogues or artifacts - git branches horizontally and document tree vertically
 
 ### **Search & AI**
 * [ ] Offline full-text search (SQLite FTS5)

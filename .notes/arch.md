@@ -3,6 +3,15 @@
 - Client: React Native + Tauri (all-platform framework)
 - Server: FastAPI
 
+
+## Data Structure
+
+* **Chamber:** The top-level vault, which is a user-selected local folder on the filesystem.
+  * **Resources - Collect:** A single message - note, highlight, image, transcript, etc.
+  * **Dialogues - Converse:** A thread of messages between user and AI, physically represented as a Git repository within the Chamber folder.
+  * **Artifacts - Collaborate:** A long message (plan, essay, speech, etc.) iteratively updated and tracked via Git. Supports multiple contributors and AI assistance.
+* **Message:** The atomic unit of knowledge (a note, a screenshot, a URL, an AI response), represented as a timestamped Markdown file with a metadata header. Every message is a Git commit.
+
 ## Data Flow
 
 - A message file can be created or moved in `resources/`, `dialogues/`, `artifacts/` via UI:

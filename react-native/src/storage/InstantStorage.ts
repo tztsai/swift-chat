@@ -142,16 +142,12 @@ export class InstantStorageService {
     });
 
     // Convert the data if available
-    if (data?.messages) {
-      const convertedMessages = data.messages.map(convertInstantToMessage);
-      return {
-        isLoading,
-        error,
-        data: { messages: convertedMessages },
-      };
-    }
-
-    return { isLoading, error, data };
+    const convertedMessages = data?.messages.map(convertInstantToMessage);
+    return {
+      isLoading,
+      error,
+      data: { messages: convertedMessages || [] },
+    };
   }
 
   // Save chat list with real-time sync
