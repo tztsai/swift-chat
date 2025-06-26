@@ -1311,7 +1311,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-document-picker (9.3.1):
+  - react-native-document-picker (10.1.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2321,7 +2321,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 33546a3ebefbccb8770c33a1f8a5554fa96a54de
   React-microtasksnativemodule: d80ff86c8902872d397d9622f1a97aadcc12cead
   react-native-compressor: f5e56b6719757d1c8fb89535df05473b3c74caf0
-  react-native-document-picker: 19bdffbe6af4cc27b4488ab7e34452fe99ff130b
+  react-native-document-picker: dbb9ea85410a892bcaa710694fb07a07de2d45cf
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
   react-native-image-picker: dbc35687199a8bf89514e09b6b105557f9f63162
   react-native-mmkv: 19bc20b3797f49c50ab4167eac443314502e6eec
@@ -2367,6 +2367,6 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: feb4910aba9742cfedc059e2b2902e22ffe9954a
 
-PODFILE CHECKSUM: 174ce092c4a890f785201a8bd235926a6db16a37
+PODFILE CHECKSUM: 74568190a7a0f2b8a361d10732d6ef7ca4cb7ee1
 
 COCOAPODS: 1.16.2
